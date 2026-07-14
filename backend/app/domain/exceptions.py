@@ -67,3 +67,9 @@ class ToolExecutionError(DomainError):
     """Raised when a LangChain tool fails."""
 
     default_message = "A tool failed to execute."
+
+
+class LLMError(DomainError):
+    """Raised when the LLM provider fails or returns unusable output."""
+
+    default_message = "The language model provider failed."
