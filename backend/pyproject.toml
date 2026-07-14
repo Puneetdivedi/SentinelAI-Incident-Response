@@ -1,0 +1,76 @@
+[project]
+name = "sentinelai-backend"
+version = "0.1.0"
+description = "SentinelAI — Autonomous Incident Response Engineer (backend)"
+readme = "../README.md"
+requires-python = ">=3.12"
+
+dependencies = [
+    # Web framework
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.32",
+    "python-multipart>=0.0.12",
+    # Data / validation
+    "pydantic>=2.9",
+    "pydantic-settings>=2.6",
+    # Persistence
+    "sqlalchemy[asyncio]>=2.0.36",
+    "asyncpg>=0.30",
+    "psycopg[binary]>=3.2",
+    "alembic>=1.14",
+    # Cache / rate limiting
+    "redis>=5.2",
+    # Vector store
+    "qdrant-client>=1.12",
+    # Security
+    "bcrypt>=4.2",
+    "python-jose[cryptography]>=3.3",
+    # AI / agents
+    "langchain>=0.3",
+    "langchain-core>=0.3",
+    "langchain-anthropic>=0.3",
+    "langgraph>=0.2.50",
+    "langfuse>=2.53",
+    # Observability
+    "opentelemetry-api>=1.28",
+    "opentelemetry-sdk>=1.28",
+    "opentelemetry-instrumentation-fastapi>=0.49b0",
+    "opentelemetry-exporter-otlp>=1.28",
+    # Reporting
+    "reportlab>=4.2",
+    "python-docx>=1.1",
+    "matplotlib>=3.9",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3",
+    "pytest-asyncio>=0.24",
+    "pytest-cov>=6.0",
+    "httpx>=0.28",
+    "aiosqlite>=0.20",
+    "ruff>=0.8",
+    "mypy>=1.13",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "ASYNC"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.mypy]
+python_version = "3.12"
+plugins = ["pydantic.mypy"]
+warn_unused_ignores = true
+disallow_untyped_defs = false
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
