@@ -81,5 +81,6 @@ class InvestigationDetail(BaseModel):
     errors: list[dict]
     langfuse_trace_id: str | None
     langfuse_session_id: str | None
+    langfuse_trace_url: str | None
     created_at: datetime
     completed_at: datetime | None

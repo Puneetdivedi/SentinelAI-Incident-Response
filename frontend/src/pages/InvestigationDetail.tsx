@@ -96,7 +96,21 @@ export function InvestigationDetail() {
       <PageHeader
         title="Investigation"
         subtitle={data.id}
-        action={<StatusBadge status={data.status} />}
+        action={
+          <div className="flex items-center gap-3">
+            {data.langfuse_trace_url && (
+              <a
+                href={data.langfuse_trace_url}
+                target="_blank"
+                rel="noreferrer"
+                className="text-sm font-medium text-brand-700 underline"
+              >
+                View LangFuse trace
+              </a>
+            )}
+            <StatusBadge status={data.status} />
+          </div>
+        }
       />
 
       <ApprovalPanel investigation={data} />

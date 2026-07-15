@@ -16,6 +16,7 @@ from typing import Any
 
 from app.config.logging import get_logger
 from app.domain.enums import AgentName
+from app.observability.tracing import record_agent_span
 from app.state.investigation_state import InvestigationState
 
 logger = get_logger(__name__)
@@ -36,6 +37,8 @@ def instrument(name: AgentName, fn: NodeFn, *, max_retries: int = DEFAULT_MAX_RE
         last_error: Exception | None = None
         started = time.perf_counter()
 
+        trace_id = state.get("langfuse_trace_id")
+
         while attempt <= max_retries:
             try:
                 update = await fn(state)
@@ -47,6 +50,13 @@ def instrument(name: AgentName, fn: NodeFn, *, max_retries: int = DEFAULT_MAX_RE
                         "attempt": attempt,
                         "latency_ms": round(latency_ms, 2),
                     },
+                )
+                record_agent_span(
+                    trace_id=trace_id,
+                    agent=name.value,
+                    latency_ms=latency_ms,
+                    attempt=attempt,
+                    confidence=(update.get("confidence_scores", {}) or {}).get(name.value),
                 )
                 # Merge bookkeeping without clobbering the node's own updates.
                 update.setdefault("current_node", name.value)
@@ -61,6 +71,13 @@ def instrument(name: AgentName, fn: NodeFn, *, max_retries: int = DEFAULT_MAX_RE
                 )
 
         logger.error("node.failed", extra={"agent": name.value, "error": str(last_error)})
+        record_agent_span(
+            trace_id=trace_id,
+            agent=name.value,
+            latency_ms=(time.perf_counter() - started) * 1000,
+            attempt=attempt,
+            error=str(last_error),
+        )
         return {
             "current_node": name.value,
             "completed_nodes": [name.value],

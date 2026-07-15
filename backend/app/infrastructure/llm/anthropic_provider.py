@@ -50,14 +50,21 @@ class AnthropicLLMProvider(LLMProvider):
     ) -> OutputT:
         from langchain_core.messages import HumanMessage, SystemMessage
 
+        from app.observability.langfuse_client import get_langchain_callback
+
+        callback = get_langchain_callback()
+        config: dict = {
+            "run_name": f"{agent.value}:{PROMPT_VERSION}",
+            "metadata": {"agent": agent.value, "prompt_version": PROMPT_VERSION},
+        }
+        if callback is not None:
+            config["callbacks"] = [callback]
+
         structured = self._chat.with_structured_output(output_model)
         try:
             result = await structured.ainvoke(
                 [SystemMessage(content=system_prompt), HumanMessage(content=user_prompt)],
-                config={
-                    "run_name": f"{agent.value}:{PROMPT_VERSION}",
-                    "metadata": {"agent": agent.value, "prompt_version": PROMPT_VERSION},
-                },
+                config=config,
             )
         except Exception as exc:  # noqa: BLE001 - normalize to a domain error
             raise LLMError(f"Anthropic call failed for agent '{agent.value}': {exc}") from exc

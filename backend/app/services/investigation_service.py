@@ -16,6 +16,9 @@ from app.domain.enums import (
 from app.domain.exceptions import EntityNotFoundError, InvestigationError, ValidationError
 from app.graphs.runner import InvestigationGraphRunner
 from app.models.incident import IncidentModel
+from app.observability.langfuse_client import flush as langfuse_flush
+from app.observability.langfuse_client import langfuse_trace_url
+from app.observability.tracing import start_investigation_trace
 from app.models.investigation import InvestigationModel
 from app.repositories.interfaces import (
     AuditLogRepository,
@@ -89,7 +92,12 @@ class InvestigationService:
             affected_service=incident.affected_service,
             langfuse_session_id=investigation.id,
         )
+        initial["langfuse_trace_id"] = start_investigation_trace(
+            investigation_id=investigation.id,
+            incident_description=incident.description,
+        )
         state = await self._runner.start(initial, thread_id=investigation.id)
+        langfuse_flush()
 
         saved = await self._investigations.save_state(
             investigation.id,
@@ -119,6 +127,7 @@ class InvestigationService:
             )
 
         final = await self._runner.resume(thread_id=investigation_id, approved=approved)
+        langfuse_flush()
         status = InvestigationStatus.COMPLETED if approved else InvestigationStatus.REJECTED
         approval = ApprovalStatus.APPROVED if approved else ApprovalStatus.REJECTED
 
@@ -191,6 +200,7 @@ class InvestigationService:
             errors=row.errors or [],
             langfuse_trace_id=row.langfuse_trace_id,
             langfuse_session_id=row.langfuse_session_id,
+            langfuse_trace_url=langfuse_trace_url(row.langfuse_trace_id),
             created_at=row.created_at,
             completed_at=row.completed_at,
         )

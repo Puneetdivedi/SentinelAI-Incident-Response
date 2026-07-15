@@ -126,6 +126,7 @@ export interface InvestigationDetail {
   errors: Record<string, unknown>[];
   langfuse_trace_id: string | null;
   langfuse_session_id: string | null;
+  langfuse_trace_url: string | null;
   created_at: string;
   completed_at: string | null;
 }
