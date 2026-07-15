@@ -4,11 +4,11 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from sqlalchemy import DateTime, Enum as SAEnum, ForeignKey, String, Text
+from sqlalchemy import DateTime, ForeignKey, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.domain.enums import IncidentSeverity, IncidentStatus
-from app.models.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
+from app.models.base import Base, TimestampMixin, UUIDPrimaryKeyMixin, sa_enum
 
 
 class IncidentModel(UUIDPrimaryKeyMixin, TimestampMixin, Base):
@@ -17,12 +17,12 @@ class IncidentModel(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     title: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[str] = mapped_column(Text, nullable=False)
     severity: Mapped[IncidentSeverity] = mapped_column(
-        SAEnum(IncidentSeverity, name="incident_severity"),
+        sa_enum(IncidentSeverity, "incident_severity"),
         default=IncidentSeverity.SEV3,
         nullable=False,
     )
     status: Mapped[IncidentStatus] = mapped_column(
-        SAEnum(IncidentStatus, name="incident_status"),
+        sa_enum(IncidentStatus, "incident_status"),
         default=IncidentStatus.OPEN,
         index=True,
         nullable=False,

@@ -6,7 +6,6 @@ from datetime import datetime
 
 from sqlalchemy import (
     DateTime,
-    Enum as SAEnum,
     Float,
     ForeignKey,
     JSON,
@@ -23,7 +22,7 @@ from app.domain.enums import (
     RiskLevel,
     RootCauseCategory,
 )
-from app.models.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
+from app.models.base import Base, TimestampMixin, UUIDPrimaryKeyMixin, sa_enum
 
 
 class InvestigationModel(UUIDPrimaryKeyMixin, TimestampMixin, Base):
@@ -36,13 +35,13 @@ class InvestigationModel(UUIDPrimaryKeyMixin, TimestampMixin, Base):
         nullable=False,
     )
     status: Mapped[InvestigationStatus] = mapped_column(
-        SAEnum(InvestigationStatus, name="investigation_status"),
+        sa_enum(InvestigationStatus, "investigation_status"),
         default=InvestigationStatus.PENDING,
         index=True,
         nullable=False,
     )
     approval_status: Mapped[ApprovalStatus] = mapped_column(
-        SAEnum(ApprovalStatus, name="approval_status"),
+        sa_enum(ApprovalStatus, "approval_status"),
         default=ApprovalStatus.PENDING,
         nullable=False,
     )
@@ -109,7 +108,7 @@ class AgentRunModel(UUIDPrimaryKeyMixin, TimestampMixin, Base):
         nullable=False,
     )
     agent: Mapped[AgentName] = mapped_column(
-        SAEnum(AgentName, name="agent_name"), nullable=False
+        sa_enum(AgentName, "agent_name"), nullable=False
     )
     status: Mapped[str] = mapped_column(String(32), nullable=False)
     retry_count: Mapped[int] = mapped_column(default=0, nullable=False)
@@ -136,7 +135,7 @@ class RootCauseModel(UUIDPrimaryKeyMixin, TimestampMixin, Base):
         nullable=False,
     )
     category: Mapped[RootCauseCategory] = mapped_column(
-        SAEnum(RootCauseCategory, name="root_cause_category"), nullable=False
+        sa_enum(RootCauseCategory, "root_cause_category"), nullable=False
     )
     title: Mapped[str] = mapped_column(String(255), nullable=False)
     reasoning: Mapped[str] = mapped_column(Text, nullable=False)
@@ -167,10 +166,10 @@ class RecommendationModel(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     title: Mapped[str] = mapped_column(String(255), nullable=False)
     justification: Mapped[str] = mapped_column(Text, nullable=False)
     priority: Mapped[RecommendationPriority] = mapped_column(
-        SAEnum(RecommendationPriority, name="recommendation_priority"), nullable=False
+        sa_enum(RecommendationPriority, "recommendation_priority"), nullable=False
     )
     risk: Mapped[RiskLevel] = mapped_column(
-        SAEnum(RiskLevel, name="risk_level"), nullable=False
+        sa_enum(RiskLevel, "risk_level"), nullable=False
     )
     confidence: Mapped[float] = mapped_column(Float, nullable=False)
     requires_approval: Mapped[bool] = mapped_column(default=True, nullable=False)

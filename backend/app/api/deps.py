@@ -18,11 +18,15 @@ from app.database.session import get_session
 from app.domain.entities import User
 from app.domain.enums import UserRole
 from app.domain.exceptions import AuthenticationError
+from app.graphs.instance import get_investigation_runner
 from app.repositories.audit_repository import SqlAlchemyAuditLogRepository
+from app.repositories.incident_repository import SqlAlchemyIncidentRepository
 from app.repositories.interfaces import AuditLogRepository, UserRepository
+from app.repositories.investigation_repository import SqlAlchemyInvestigationRepository
 from app.repositories.user_repository import SqlAlchemyUserRepository
 from app.services.audit_service import AuditService
 from app.services.auth_service import AuthService
+from app.services.investigation_service import InvestigationService
 from app.services.user_service import UserService
 from app.utils.security import decode_token
 
@@ -58,9 +62,21 @@ def get_audit_service(audit: AuditRepoDep) -> AuditService:
     return AuditService(audit)
 
 
+def get_investigation_service(session: SessionDep) -> InvestigationService:
+    return InvestigationService(
+        incidents=SqlAlchemyIncidentRepository(session),
+        investigations=SqlAlchemyInvestigationRepository(session),
+        runner=get_investigation_runner(),
+        audit_repository=SqlAlchemyAuditLogRepository(session),
+    )
+
+
 AuthServiceDep = Annotated[AuthService, Depends(get_auth_service)]
 UserServiceDep = Annotated[UserService, Depends(get_user_service)]
 AuditServiceDep = Annotated[AuditService, Depends(get_audit_service)]
+InvestigationServiceDep = Annotated[
+    InvestigationService, Depends(get_investigation_service)
+]
 
 
 # ── Authentication / RBAC ────────────────────────────────────

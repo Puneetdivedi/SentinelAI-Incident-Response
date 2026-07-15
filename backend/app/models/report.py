@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
-from sqlalchemy import Enum as SAEnum, ForeignKey, String, Text
+from sqlalchemy import ForeignKey, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.domain.enums import ReportFormat
-from app.models.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
+from app.models.base import Base, TimestampMixin, UUIDPrimaryKeyMixin, sa_enum
 
 
 class ReportModel(UUIDPrimaryKeyMixin, TimestampMixin, Base):
@@ -19,7 +19,7 @@ class ReportModel(UUIDPrimaryKeyMixin, TimestampMixin, Base):
         nullable=False,
     )
     format: Mapped[ReportFormat] = mapped_column(
-        SAEnum(ReportFormat, name="report_format"),
+        sa_enum(ReportFormat, "report_format"),
         default=ReportFormat.MARKDOWN,
         nullable=False,
     )
