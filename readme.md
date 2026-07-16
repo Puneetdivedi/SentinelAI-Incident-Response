@@ -4,9 +4,9 @@ SentinelAI is an enterprise-grade AI incident response platform that helps SREs 
 
 ## Live Demo
 
-**Live application:** https://sentinelai-incident-response.vercel.app
+**Target Vercel application:** https://sentinelai-incident-response.vercel.app
 
-> This link is the intended Vercel target. It becomes active once the frontend is deployed successfully and the backend endpoint is configured.
+> This project is configured for Vercel deployment. The frontend becomes live after you configure the backend endpoint and GitHub Action secrets.
 
 ## What This Project Does
 
@@ -151,8 +151,9 @@ The full stack is orchestrated with `docker-compose.yml`:
 
 ### Vercel support
 
-- `frontend/vercel.json` — Vercel build config and environment defaults.
+- `frontend/vercel.json` — Vercel build config.
 - `frontend/public/_redirects` — SPA route fallback for client-side navigation.
+- `docs/DEPLOYMENT.md` — Vercel deployment and backend host setup.
 
 ## Health, observability, and quality
 
@@ -182,6 +183,8 @@ Critical environment variables:
 - `ANTHROPIC_API_KEY`
 - `OPENAI_API_KEY`
 - `VITE_API_BASE_URL`
+- `BACKEND_PORT`
+- `FRONTEND_PORT`
 
 ## Suitable industry use cases
 
