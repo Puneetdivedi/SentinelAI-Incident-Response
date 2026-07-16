@@ -1,47 +1,124 @@
 # SentinelAI
 
-SentinelAI is an AI-powered incident response platform with a FastAPI backend and a React frontend.
+SentinelAI is an AI-powered incident response platform designed to help teams investigate, analyze, and respond to production incidents faster. The system combines a FastAPI backend, a React frontend, and supporting services such as PostgreSQL, Redis, and Qdrant to provide a full incident investigation workflow.
 
-## Run locally
+## Overview
 
-1. Copy the example environment file:
+SentinelAI aims to reduce incident investigation time by combining:
+
+- automated investigation workflows
+- multi-agent reasoning
+- incident storage and retrieval
+- observability and reporting
+- secure authentication and admin controls
+
+## Project Structure
+
+- backend/: FastAPI application, services, repositories, agents, and infrastructure code
+- frontend/: React + Vite user interface
+- docker-compose.yml: container orchestration for the full stack
+- scripts/deploy.sh: simple deployment entrypoint for hosted environments
+
+## Tech Stack
+
+### Backend
+- Python 3.12+
+- FastAPI
+- SQLAlchemy
+- Alembic
+- Pydantic
+- Redis
+- PostgreSQL
+- Qdrant
+- LangChain / LangGraph
+- OpenTelemetry
+- JWT-based authentication
+
+### Frontend
+- React
+- TypeScript
+- Vite
+- Tailwind CSS
+- React Query
+- Axios
+- Recharts
+
+## Getting Started
+
+### Prerequisites
+
+- Docker and Docker Compose
+- Python 3.12+ (for local backend development)
+- Node.js 22+ (for local frontend development)
+
+### Run with Docker Compose
+
+1. Copy the environment example file:
    ```bash
    cp .env.example .env
    ```
-2. Start the full stack with Docker Compose:
+2. Update the values in .env for your environment.
+3. Start the stack:
    ```bash
    docker compose up --build -d
    ```
-3. Open the UI at http://localhost:5173 and the API at http://localhost:8000/health.
+4. Access the application:
+   - Frontend: http://localhost:5173
+   - Backend health check: http://localhost:8000/health
 
-## Production-style deployment
+### Local Development
 
-The repository is configured for a hosted deployment using Docker Compose on a VPS or cloud VM.
+#### Backend
+```bash
+cd backend
+pip install .[dev]
+uvicorn app.main:app --reload
+```
 
-### Recommended flow
+#### Frontend
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
-1. Fill in the values in .env for your host.
-2. Start the stack with:
-   ```bash
-   ./scripts/deploy.sh
-   ```
-3. Verify the services:
-   ```bash
-   docker compose ps
-   curl http://localhost:8000/health
-   ```
+## Deployment
 
-### Important environment variables
+The repository includes a Docker Compose-based deployment flow suitable for a VPS or cloud-hosted environment.
 
-- JWT_SECRET_KEY: a strong secret for signing tokens.
-- BOOTSTRAP_ADMIN_EMAIL and BOOTSTRAP_ADMIN_PASSWORD: initial admin credentials.
-- APP_ENV=production and APP_DEBUG=false for hosted deployments.
+### Host deployment
 
-## Project structure
+```bash
+chmod +x scripts/deploy.sh
+./scripts/deploy.sh
+```
 
-- backend/: FastAPI application and services
-- frontend/: React + Vite UI
-- docker-compose.yml: orchestrates PostgreSQL, Redis, Qdrant, backend, and frontend
+This script will:
+- verify that .env exists
+- build and start the Docker containers
+- expose the frontend and backend services
+
+## Environment Variables
+
+Key variables include:
+
+- JWT_SECRET_KEY
+- BOOTSTRAP_ADMIN_EMAIL
+- BOOTSTRAP_ADMIN_PASSWORD
+- POSTGRES_USER / POSTGRES_PASSWORD / POSTGRES_DB
+- APP_ENV
+- APP_DEBUG
+- LLM_PROVIDER
+
+## Notes
+
+- Use production values for secrets and admin credentials.
+- For hosted deployments, set APP_ENV=production and APP_DEBUG=false.
+- The backend includes health checks and readiness endpoints for container orchestration.
+
+## License
+
+This project is intended for internal or demonstration use unless otherwise specified by the repository owner.
 
 config/
 
