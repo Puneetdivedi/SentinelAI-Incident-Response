@@ -1,179 +1,207 @@
 # SentinelAI
 
-SentinelAI is an enterprise-grade AI incident response platform that helps engineering and operations teams investigate production incidents faster, identify root causes, and execute remediation with confidence. It uses a modern React dashboard, a FastAPI backend, and a multi-agent orchestration layer to bring AI-driven incident reasoning into a structured, traceable workflow.
+SentinelAI is an enterprise-grade AI incident response platform that helps SREs and engineering teams investigate production incidents faster, identify root causes, and execute remediation with confidence. It combines a React operations dashboard, a FastAPI backend, and a LangGraph multi-agent orchestration layer to deliver a structured, observable incident response experience.
 
 ## Live Demo
 
 **Live application:** https://sentinelai-incident-response.vercel.app
 
-> This link points to the Vercel deployment target. The actual app becomes available once the Vercel project is configured and the GitHub auto-deploy succeeds.
+> This link is the intended Vercel target. It becomes active once the frontend is deployed successfully and the backend endpoint is configured.
 
 ## What This Project Does
 
-SentinelAI is designed to support the full incident response lifecycle:
+SentinelAI provides a complete incident response workflow:
 
-- Accept incident investigation requests from SREs and engineers.
-- Run autonomous analysis using specialized agents.
-- Correlate alerts, logs, metrics, deployments, and dependency health.
-- Search historical incidents for similar failure patterns.
-- Generate ranked root cause hypotheses and remediation recommendations.
-- Produce executive and technical incident reports.
-- Support human approval on final remediation decisions.
-- Persist investigation outputs for later review and compliance.
+- Accepts incident investigation requests from users.
+- Executes autonomous evidence gathering through specialized agents.
+- Correlates alerts, logs, metrics, deployments, dependencies, and historical incidents.
+- Generates ranked root cause hypotheses and remediation recommendations.
+- Produces executive and technical incident reports.
+- Supports human approval of remediation before persistence.
+- Persists investigation context, audit logs, and reports for future review.
 
 ## Industry-Level Architecture
 
-SentinelAI follows a layered Clean Architecture structure:
+SentinelAI is built using Clean Architecture principles:
 
-- **API layer** (`backend/app/api`): FastAPI routes, request validation, and response serialization.
-- **Application layer** (`backend/app/services`, `backend/app/agents`, `backend/app/graphs`, `backend/app/tools`): business orchestration, investigation workflows, agent execution, and tool integration.
-- **Domain layer** (`backend/app/domain`): core incident and investigation entities, value objects, enums, and domain exceptions.
-- **Infrastructure layer** (`backend/app/infrastructure`, `backend/app/repositories`): database access, Redis caching, vector search, LLM provider adapters, and mock data sources.
-- **Observability and telemetry** (`backend/app/observability`): LangFuse tracing and OpenTelemetry instrumentation.
+- **API layer** (`backend/app/api`): FastAPI endpoints, input validation, response serialization.
+- **Application layer** (`backend/app/services`, `backend/app/agents`, `backend/app/graphs`, `backend/app/tools`): orchestration, business use cases, agent execution, tool integration.
+- **Domain layer** (`backend/app/domain`): core incident and investigation entities, value objects, enums, and domain rules.
+- **Infrastructure layer** (`backend/app/infrastructure`, `backend/app/repositories`): database, caching, vector search, LLM adapters, and datasource providers.
+- **Observability** (`backend/app/observability`): LangFuse and OpenTelemetry instrumentation for traceability.
 
-### Core architectural principles
+### Core principles
 
-- **Clean Architecture:** inner business rules do not depend on outer frameworks.
-- **Domain-Driven Design:** domain concepts are modeled independently of transport and persistence.
-- **Repository pattern:** persistence is abstracted behind repository interfaces.
-- **Dependency injection:** services and routes receive dependencies from configuration.
-- **Multi-agent orchestration:** a supervisor graph coordinates specialized agents and allows conditional routing.
-- **Production readiness:** containerized deployment, health checks, and CI support.
+- **Clean layering:** inner business rules do not depend on outer frameworks.
+- **Domain-driven modeling:** incident and investigation concepts are expressed as domain objects.
+- **Repository pattern:** persistence behind interfaces; database details are replaceable.
+- **Dependency injection:** services receive collaborators from configuration.
+- **Multi-agent orchestration:** a supervisor graph coordinates agent execution and approval flow.
+- **Deployment readiness:** Docker Compose, Vercel support, health checks, and CI workflows.
 
 ## System Capabilities
 
-### AI & orchestration
+### AI orchestration
 
-- **Supervisor Graph:** the orchestrator controlling agent execution, retry logic, and approval flows.
-- **Agents:** independent units specializing in alert analysis, log analysis, metrics analysis, deployment analysis, dependency analysis, historical incident search, root cause analysis, recommendation generation, reflection, reporting, and notification drafting.
-- **LangChain Tools:** reusable tools for searching logs, querying metrics, retrieving deployment history, vector-searching incident memory, executing SQL, producing markdown/PDF/Word reports, and generating charts.
-- **State management:** typed investigation state captures incident details, execution plan, completed nodes, evidence, hypotheses, recommendations, logs, and trace IDs.
+- **Supervisor Graph:** orchestrates the flow of agent execution, retries, and approval states.
+- **Specialized agents:** alert analysis, log analysis, metrics analysis, deployment analysis, dependency analysis, historical incident search, root cause analysis, recommendation generation, reflection, reporting, and notification drafting.
+- **LangChain tools:** reusable tools for log search, metrics query, deployment history, incident search, vector search, SQL execution, markdown/PDF/Word reporting, chart generation, and timeline creation.
+- **Typed investigation state:** tracks incident metadata, execution plan, agent outputs, evidence, hypotheses, recommendations, logs, trace IDs, and approval status.
 
 ### Backend capabilities
 
-- **FastAPI routes:** authentication, incident and investigation management, reports, users, health, and readiness.
-- **Services:** business use cases in `backend/app/services/*` orchestrate persistence, state changes, and domain logic.
-- **Data persistence:** PostgreSQL with SQLAlchemy models and Alembic migrations.
-- **Cache and session stores:** Redis for rate limiting, notifications, and transient coordination.
-- **Vector search:** Qdrant stores investigation memory and historical incident knowledge.
-- **Security:** JWT auth with access/refresh tokens, role-based access control, and audit logging.
-- **Observability:** LangFuse and OpenTelemetry instrumentation for model calls, API requests, and agent execution.
+- **FastAPI REST API:** authentication, incidents, investigations, reports, users, health checks.
+- **Business services:** application use cases in `backend/app/services/*`.
+- **SQL persistence:** PostgreSQL, SQLAlchemy ORM, Alembic migrations.
+- **Redis support:** caching, rate limiting, session coordination.
+- **Qdrant vector search:** historical incident memory and semantic retrieval.
+- **Security:** JWT access + refresh token auth, RBAC roles, request validation, audit logging.
+- **Observability:** LangFuse event tracking and OpenTelemetry tracing.
 
 ### Frontend capabilities
 
-- **React dashboard:** provides a centralized incident operations view.
-- **Pages:** Login, Dashboard, Incidents, Investigation detail, Historical incidents, Settings, and more.
-- **Data fetching:** React Query and Axios for authenticated REST interaction.
-- **Visualizations:** status badges, charts, incident lists, and investigation timelines.
-- **Protected routes:** authenticated access and role-based safeguards.
-- **Static build ready:** Vite-based production build with SPA routing support.
+- **React dashboard:** modern incident operations interface.
+- **Main pages:** Login, Dashboard, Incidents, Investigation Detail, Historical Incidents, Settings.
+- **Data layer:** React Query and Axios with token refresh handling.
+- **UI components:** shared badges, cards, protected routes, and layout.
+- **SPA routing:** Vite with client-side routing and fallback support.
+- **Deployment-ready:** static build via Vite and Vercel-friendly config.
 
-## File and component mapping
+## File and component map
 
 ### Backend
 
-- `backend/app/main.py`: application factory, startup lifecycle, logging, and CORS.
-- `backend/app/config/settings.py`: environment-driven configuration with production validation.
-- `backend/app/api/v1/routes/`: FastAPI route modules for `auth`, `users`, `incidents`, `investigations`, and `health`.
-- `backend/app/services/`: application use cases and service orchestration.
-- `backend/app/agents/`: specialized agent implementations.
-- `backend/app/graphs/`: LangGraph supervisor graph and runner.
-- `backend/app/tools/`: LangChain tools and toolset definitions.
-- `backend/app/domain/`: enterprise core models, exceptions, enums, and value objects.
-- `backend/app/repositories/`: repository interfaces and SQLAlchemy implementations.
-- `backend/app/infrastructure/`: LLM provider adapters and mock data sources.
-- `backend/app/observability/`: tracing and LangFuse client.
-- `backend/app/middleware/`: correlation ID and error handling middleware.
-- `backend/app/models/`: ORM models for users, incidents, investigations, reports, and audit logs.
-- `backend/tests/`: unit, integration, graph, api, and agent tests.
+- `backend/app/main.py` — application factory, lifecycle, logging, CORS, and startup behavior.
+- `backend/app/config/settings.py` — environment-driven configuration with production validation.
+- `backend/app/config/logging.py` — logging setup and structured log output.
+- `backend/app/api/v1/routes/` — API routes for authentication, users, incidents, investigations, and health.
+- `backend/app/api/deps.py` — dependency injection helpers and authentication dependencies.
+- `backend/app/services/` — application service classes implementing business operations.
+- `backend/app/agents/` — agent classes for reasoning, analysis, control, and reporting.
+- `backend/app/graphs/` — supervisor graph, runner, registry, and node definitions.
+- `backend/app/tools/` — tool definitions for reusable LangChain/LLM operations.
+- `backend/app/domain/` — entities, value objects, enums, and domain exceptions.
+- `backend/app/repositories/` — repository interfaces and concrete SQLAlchemy implementations.
+- `backend/app/infrastructure/` — LLM providers, datasource providers, and mock infrastructure.
+- `backend/app/state/` — typed investigation state management.
+- `backend/app/models/` — SQLAlchemy models for users, incidents, investigations, reports, and audit logs.
+- `backend/app/middleware/` — error handling and correlation ID middleware.
+- `backend/app/observability/` — LangFuse client and OpenTelemetry tracing setup.
+- `backend/app/prompts/` — agent prompt templates and system message definitions.
+- `backend/tests/` — unit, integration, graph, API, and agent tests.
+- `backend/alembic/` — database migration scripts and environment config.
+- `backend/docker-entrypoint.sh` — container startup script with database readiness and migrations.
+- `backend/Dockerfile` — backend container image build.
 
 ### Frontend
 
-- `frontend/src/App.tsx`: top-level route configuration.
-- `frontend/src/main.tsx`: React app bootstrap.
-- `frontend/src/pages/`: application screens.
-- `frontend/src/services/api.ts`: Axios instance and auth token handling.
-- `frontend/src/hooks/queries.ts`: server-state hooks using React Query.
-- `frontend/src/contexts/AuthContext.tsx`: authentication state.
-- `frontend/src/components/ProtectedRoute.tsx`: route level auth guard.
-- `frontend/src/layouts/DashboardLayout.tsx`: main app layout.
-- `frontend/src/components/ui.tsx`: shared UI controls and badges.
-- `frontend/vercel.json`: Vercel static deployment configuration.
-- `frontend/public/_redirects`: SPA redirect support.
+- `frontend/src/main.tsx` — React app bootstrap.
+- `frontend/src/App.tsx` — route and page configuration.
+- `frontend/src/pages/` — pages for dashboard, incidents, investigation details, historical incidents, login, settings.
+- `frontend/src/services/api.ts` — Axios instance, auth header injection, refresh token handling.
+- `frontend/src/hooks/queries.ts` — API query hooks using React Query.
+- `frontend/src/contexts/AuthContext.tsx` — authentication state and provider.
+- `frontend/src/components/ProtectedRoute.tsx` — auth-protected route wrapper.
+- `frontend/src/layouts/DashboardLayout.tsx` — shared dashboard layout.
+- `frontend/src/components/ui.tsx` — shared UI primitives and badges.
+- `frontend/vercel.json` — Vercel static deployment config.
+- `frontend/public/_redirects` — redirect support for SPA routing.
+- `frontend/Dockerfile` — frontend container build.
+- `frontend/tsconfig.json`, `frontend/vite.config.ts` — TypeScript and Vite build config.
 
-## What makes this project industry-level
+## Agents, graphs, and tools
 
-- **Modular architecture:** clean separation of API, services, domain, and infrastructure.
-- **Production-first deployment:** Docker Compose, Vercel support, health checks, and CI workflows.
-- **AI-driven orchestration:** multi-agent supervisor graph with retries, approvals, and resume capability.
-- **Observability:** LangFuse and OpenTelemetry for tracing, and health/readiness endpoints.
-- **Security:** role-based access, JWT, and configuration validation.
-- **Test coverage:** unit and integration tests cover backend and graph logic.
-- **Documentation:** architecture docs, deployment docs, and README guidance.
+- `backend/app/agents/analysis_agents.py` — evidence-gathering agents for alerts, logs, metrics, deployments, and dependencies.
+- `backend/app/agents/reasoning_agents.py` — reasoning agents for root cause, recommendation, and reflection.
+- `backend/app/agents/reporting_agents.py` — report generation and notification drafting.
+- `backend/app/graphs/supervisor_graph.py` — graph definition and execution order.
+- `backend/app/graphs/runner.py` — graph runner and checkpointing.
+- `backend/app/graphs/baseline_nodes.py` — base nodes and reusable graph node patterns.
+- `backend/app/tools/retrieval_tools.py` — vector and memory retrieval tools.
+- `backend/app/tools/report_tools.py` — report generation, chart, and document tools.
+- `backend/app/tools/analysis_tools.py` — analysis helpers and prompt-based tool wrappers.
+- `backend/app/tools/base.py` — base tool classes and interface definitions.
 
-## Deployment
+## Dashboard and frontend experience
 
-### Local Docker deployment
+The dashboard is built for operational visibility:
 
-```bash
-cp .env.example .env
-docker compose up --build -d
-```
+- **Dashboard page:** incident counts, active incident summary, awaiting approval stats.
+- **Incident list:** quick access to open incidents with severity and status.
+- **Investigation details:** investigation state, agent outputs, reports, and approval actions.
+- **Historical view:** search and replay past incident investigations.
+- **Settings:** configuration and user profile controls.
 
-- Frontend: `http://localhost:5173`
-- Backend health: `http://localhost:8000/health`
+## Deployment and CI
 
-### Local development
+### Docker Compose
 
-#### Backend
-```bash
-cd backend
-pip install .[dev]
-uvicorn app.main:app --reload
-```
+The full stack is orchestrated with `docker-compose.yml`:
 
-#### Frontend
-```bash
-cd frontend
-npm install
-npm run dev
-```
+- `postgres` — primary relational database.
+- `redis` — cache and coordination.
+- `qdrant` — vector search store.
+- `backend` — FastAPI application.
+- `frontend` — static frontend served by Nginx.
 
-### Vercel automatic frontend deployment
+### GitHub Actions
 
-Add GitHub Actions secrets in the repository Settings → Secrets → Actions:
+- `.github/workflows/ci.yml` — backend lint/test and frontend build validation.
+- `.github/workflows/vercel-deploy.yml` — automated frontend deployment to Vercel on `main`.
 
-- `VERCEL_TOKEN`
-- `VERCEL_ORG_ID`
-- `VERCEL_PROJECT_ID`
+### Vercel support
 
-The deployment workflow is at `.github/workflows/vercel-deploy.yml`.
+- `frontend/vercel.json` — Vercel build config and environment defaults.
+- `frontend/public/_redirects` — SPA route fallback for client-side navigation.
 
-## Environment variables
+## Health, observability, and quality
 
-Important variables:
+- `/health` — liveness endpoint.
+- `/health/ready` — readiness check against the database.
+- LangFuse tracing for LLM calls and agent workflow execution.
+- OpenTelemetry for API and backend tracing.
+- JSON structured logs and correlation IDs.
+- `scripts/quality-check.sh` — local lint and test quality gate.
 
+## Environment Variables
+
+Critical environment variables:
+
+- `APP_ENV`
+- `APP_DEBUG`
 - `JWT_SECRET_KEY`
 - `BOOTSTRAP_ADMIN_EMAIL`
 - `BOOTSTRAP_ADMIN_PASSWORD`
 - `POSTGRES_USER`
 - `POSTGRES_PASSWORD`
 - `POSTGRES_DB`
-- `APP_ENV`
-- `APP_DEBUG`
+- `DATABASE_URL`
+- `REDIS_URL`
+- `QDRANT_URL`
 - `LLM_PROVIDER`
+- `ANTHROPIC_API_KEY`
+- `OPENAI_API_KEY`
 - `VITE_API_BASE_URL`
+
+## Suitable industry use cases
+
+- Incident response automation for cloud-native services.
+- Post-incident root cause investigation and reporting.
+- SRE workflow acceleration and documentation generation.
+- Knowledge retention through vectorized incident memory.
+- Decision support for remediation approval and stakeholder communication.
 
 ## Recommended next steps
 
-1. Configure a real backend host and set `VITE_API_BASE_URL` in Vercel.
-2. Add production-grade data providers for logs, metrics, and deployments.
-3. Replace mock datasources with real observability connectors.
-4. Add role-specific dashboards and approval workflows for SRE and business users.
+1. Wire real data providers for logs, metrics, and deployment history.
+2. Add production-grade observability connectors (Loki, Prometheus, Grafana, Sentry).
+3. Harden authentication and RBAC rules for multi-tenant operations.
+4. Complete the dashboard with timelines, root cause visualizations, and report exports.
+5. Configure Vercel with the real backend URL and confirm the first successful deployment.
 
 ## License
 
-This project is intended for internal and demo use unless otherwise specified by the repository owner.
+This project is intended for internal, demonstration, or portfolio use unless otherwise specified by the repository owner.
 
 Timeline Generator
 
