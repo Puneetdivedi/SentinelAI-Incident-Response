@@ -55,9 +55,12 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     # In non-production, ensure the schema exists for a frictionless first run.
     # Production relies on Alembic migrations instead.
     if not settings.is_production:
-        engine = get_engine()
-        async with engine.begin() as conn:
-            await conn.run_sync(Base.metadata.create_all)
+        try:
+            engine = get_engine()
+            async with engine.begin() as conn:
+                await conn.run_sync(Base.metadata.create_all)
+        except Exception as exc:  # pragma: no cover - startup resilience path
+            logger.warning("app.schema_init_failed", extra={"error": str(exc)})
 
     await _seed_admin(settings)
     yield

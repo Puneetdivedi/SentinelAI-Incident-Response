@@ -10,7 +10,7 @@ from __future__ import annotations
 from functools import lru_cache
 from typing import Literal
 
-from pydantic import Field, PostgresDsn, field_validator
+from pydantic import Field, field_validator, ValidationInfo
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -74,6 +74,22 @@ class Settings(BaseSettings):
         """Allow a comma-separated string in the env file."""
         if isinstance(value, str):
             return [origin.strip() for origin in value.split(",") if origin.strip()]
+        return value
+
+    @field_validator("jwt_secret_key")
+    @classmethod
+    def _validate_jwt_secret(cls, value: str, info: ValidationInfo) -> str:
+        """Require a non-default secret in production environments."""
+        if info.data.get("app_env") == "production" and value in {"change-me-to-a-long-random-string", "change-me-in-production"}:
+            raise ValueError("JWT_SECRET_KEY must be set to a secure value in production")
+        return value
+
+    @field_validator("app_debug")
+    @classmethod
+    def _validate_debug(cls, value: bool, info: ValidationInfo) -> bool:
+        """Prevent debug mode in production by default."""
+        if info.data.get("app_env") == "production" and value:
+            return False
         return value
 
     @property
