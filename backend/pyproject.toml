@@ -2,7 +2,6 @@
 name = "sentinelai-backend"
 version = "0.1.0"
 description = "SentinelAI — Autonomous Incident Response Engineer (backend)"
-readme = "../README.md"
 requires-python = ">=3.12"
 
 dependencies = [
@@ -13,6 +12,7 @@ dependencies = [
     # Data / validation
     "pydantic>=2.9",
     "pydantic-settings>=2.6",
+    "email-validator>=2.0",
     # Persistence
     "sqlalchemy[asyncio]>=2.0.36",
     "asyncpg>=0.30",
@@ -74,3 +74,6 @@ disallow_untyped_defs = false
 [build-system]
 requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["app*"]
