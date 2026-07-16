@@ -4,9 +4,7 @@ SentinelAI is an enterprise-style AI incident response platform designed to acce
 
 ## Live Demo
 
-Live application: https://sentinelai.example.com
-
-> Replace the placeholder URL above with your actual hosted deployment URL once the app is live.
+Live application: https://sentinelai-incident-response.vercel.app
 
 ## What This Project Does
 
