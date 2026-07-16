@@ -120,6 +120,20 @@ This script will:
 - build and start the Docker containers
 - expose the frontend and backend services
 
+## Automatic Vercel deploy (GitHub Actions)
+
+This repository includes a GitHub Actions workflow that will automatically build and deploy the `frontend` folder to Vercel on pushes to `main`.
+
+Required GitHub repository secrets (add at Settings → Secrets → Actions):
+
+- `VERCEL_TOKEN` — your personal Vercel token (required)
+- `VERCEL_ORG_ID` — your Vercel organization ID (recommended)
+- `VERCEL_PROJECT_ID` — your Vercel project ID (recommended)
+
+Once those secrets are set the action `.github/workflows/vercel-deploy.yml` will run and publish to Vercel.
+
+If you prefer to manage deployments from the Vercel dashboard, import the repo there and set the project root to `frontend`.
+
 ## Environment Variables
 
 Key environment variables include:
