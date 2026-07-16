@@ -11,6 +11,12 @@ from app.config.settings import get_settings
 router = APIRouter(tags=["health"])
 
 
+@router.get("/")
+async def root() -> dict[str, str]:
+    """Basic service root endpoint for host health checks."""
+    return {"status": "ok", "app": get_settings().app_name}
+
+
 @router.get("/health")
 async def health() -> dict[str, str]:
     """Liveness probe."""
@@ -21,4 +27,4 @@ async def health() -> dict[str, str]:
 async def readiness(session: SessionDep) -> dict[str, str]:
     """Readiness probe — verifies the database is reachable."""
     await session.execute(text("SELECT 1"))
-    return {"status": "ready"}
+    return {"status": "ready", "app": get_settings().app_name}

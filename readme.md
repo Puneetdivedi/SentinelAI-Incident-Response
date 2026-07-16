@@ -1,263 +1,47 @@
-# Claude Code Master Prompt
+# SentinelAI
 
-You are a Principal Staff AI Engineer, Solutions Architect, Site Reliability Engineer (SRE), and Full Stack Engineer with expertise in building enterprise AI systems.
+SentinelAI is an AI-powered incident response platform with a FastAPI backend and a React frontend.
 
-Your expertise includes:
+## Run locally
 
-* Python 3.12+
-* FastAPI
-* LangChain
-* LangGraph
-* LangFuse
-* OpenTelemetry
-* PostgreSQL
-* Redis
-* Docker
-* Kubernetes
-* React
-* TypeScript
-* Tailwind CSS
-* SQLAlchemy
-* Alembic
-* JWT Authentication
-* Qdrant
-* Clean Architecture
-* Domain Driven Design
-* Repository Pattern
-* Dependency Injection
-* Enterprise Software Architecture
-* Production AI Systems
-* Distributed Systems
-* Observability
-* CI/CD
-* Prompt Engineering
-* Multi-Agent Systems
+1. Copy the example environment file:
+   ```bash
+   cp .env.example .env
+   ```
+2. Start the full stack with Docker Compose:
+   ```bash
+   docker compose up --build -d
+   ```
+3. Open the UI at http://localhost:5173 and the API at http://localhost:8000/health.
 
-Your responsibility is to design and implement a production-ready enterprise application.
+## Production-style deployment
 
-Do NOT generate toy code.
+The repository is configured for a hosted deployment using Docker Compose on a VPS or cloud VM.
 
-Do NOT generate tutorial code.
+### Recommended flow
 
-Everything must follow production engineering best practices.
+1. Fill in the values in .env for your host.
+2. Start the stack with:
+   ```bash
+   ./scripts/deploy.sh
+   ```
+3. Verify the services:
+   ```bash
+   docker compose ps
+   curl http://localhost:8000/health
+   ```
 
----
+### Important environment variables
 
-# PROJECT
+- JWT_SECRET_KEY: a strong secret for signing tokens.
+- BOOTSTRAP_ADMIN_EMAIL and BOOTSTRAP_ADMIN_PASSWORD: initial admin credentials.
+- APP_ENV=production and APP_DEBUG=false for hosted deployments.
 
-SentinelAI – Autonomous Incident Response Engineer
+## Project structure
 
-Tagline:
-
-AI-powered Site Reliability Engineer that autonomously investigates production incidents, correlates logs, metrics, deployments, and historical knowledge, determines probable root causes, recommends remediation, and assists engineers during live incidents.
-
----
-
-# OBJECTIVE
-
-Build an enterprise AI platform capable of reducing incident investigation time from hours to minutes.
-
-The platform should support:
-
-* Autonomous investigation
-* Multi-agent collaboration
-* Incident reasoning
-* Root cause analysis
-* Historical incident retrieval
-* Recommendation generation
-* Human approval
-* Incident reporting
-* Full observability with LangFuse
-
----
-
-# BUSINESS SCENARIO
-
-Example incident:
-
-Users cannot log in.
-
-Authentication API returns HTTP 500.
-
-CPU usage spikes.
-
-Memory consumption increases.
-
-Database connections are exhausted.
-
-Redis latency increases.
-
-A deployment occurred 5 minutes before the incident.
-
-Instead of requiring engineers to manually inspect every dashboard, the AI should investigate autonomously.
-
----
-
-# USER WORKFLOW
-
-Example prompt:
-
-"Investigate why login requests are failing."
-
-The system should automatically:
-
-Understand the request
-
-Create an execution plan
-
-Inspect monitoring alerts
-
-Retrieve logs
-
-Inspect deployments
-
-Analyze metrics
-
-Correlate evidence
-
-Search historical incidents
-
-Determine probable root causes
-
-Suggest remediation
-
-Generate executive report
-
-Wait for human approval
-
-Generate notifications
-
-Store the investigation
-
----
-
-# TECH STACK
-
-Backend
-
-Python
-
-FastAPI
-
-LangChain
-
-LangGraph
-
-LangFuse
-
-SQLAlchemy
-
-Alembic
-
-Redis
-
-PostgreSQL
-
-Qdrant
-
-JWT Authentication
-
-OpenTelemetry
-
-Pydantic v2
-
-Docker
-
-Docker Compose
-
-Frontend
-
-React
-
-TypeScript
-
-Tailwind
-
-React Query
-
-Axios
-
-Recharts
-
-Markdown Renderer
-
-Monaco Editor
-
-Authentication
-
-JWT
-
-Refresh Tokens
-
-RBAC
-
-Admin
-
-SRE
-
-Viewer
-
----
-
-# ARCHITECTURE
-
-Follow Clean Architecture.
-
-Use:
-
-Controllers
-
-Services
-
-Repositories
-
-Domain
-
-Infrastructure
-
-Application Layer
-
-Dependency Injection
-
-Every module must be reusable.
-
-Every service must have interfaces.
-
-No business logic inside API routes.
-
----
-
-# PROJECT STRUCTURE
-
-Create an enterprise folder structure.
-
-backend/
-
-app/
-
-api/
-
-agents/
-
-graphs/
-
-state/
-
-prompts/
-
-tools/
-
-repositories/
-
-services/
-
-database/
-
-models/
-
-schemas/
-
-middleware/
+- backend/: FastAPI application and services
+- frontend/: React + Vite UI
+- docker-compose.yml: orchestrates PostgreSQL, Redis, Qdrant, backend, and frontend
 
 config/
 
