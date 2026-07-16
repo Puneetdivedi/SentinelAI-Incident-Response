@@ -1,23 +1,47 @@
 # SentinelAI
 
-SentinelAI is an AI-powered incident response platform designed to help teams investigate, analyze, and respond to production incidents faster. The system combines a FastAPI backend, a React frontend, and supporting services such as PostgreSQL, Redis, and Qdrant to provide a full incident investigation workflow.
+SentinelAI is an enterprise-style AI incident response platform designed to accelerate production incident investigation, root cause analysis, and remediation planning. It combines a modern React frontend, a FastAPI backend, and supporting infrastructure services to give teams a practical, production-ready incident command experience.
 
-## Overview
+## Live Demo
 
-SentinelAI aims to reduce incident investigation time by combining:
+Live application: https://sentinelai.example.com
 
-- automated investigation workflows
-- multi-agent reasoning
-- incident storage and retrieval
-- observability and reporting
-- secure authentication and admin controls
+> Replace the placeholder URL above with your actual hosted deployment URL once the app is live.
+
+## What This Project Does
+
+SentinelAI helps engineering and operations teams:
+
+- investigate incidents with AI-assisted reasoning
+- correlate alerts, logs, metrics, deployments, and dependencies
+- generate structured incident summaries and recommendations
+- store investigation context for future analysis
+- provide a web-based workspace for fast collaboration during incidents
+
+## Core Features
+
+- AI-powered incident investigation workflow
+- multi-agent reasoning architecture
+- health and readiness monitoring endpoints
+- secure authentication and bootstrap admin support
+- Docker-based deployment for local and hosted environments
+- observability and reporting hooks for production use
+
+## Architecture Overview
+
+The platform is organized into:
+
+- Backend: FastAPI, SQLAlchemy, Alembic, Pydantic, Redis, PostgreSQL, Qdrant, LangChain/LangGraph
+- Frontend: React, TypeScript, Vite, Tailwind CSS, React Query, Axios
+- Infrastructure: Docker Compose with PostgreSQL, Redis, Qdrant, backend, and frontend services
 
 ## Project Structure
 
 - backend/: FastAPI application, services, repositories, agents, and infrastructure code
 - frontend/: React + Vite user interface
 - docker-compose.yml: container orchestration for the full stack
-- scripts/deploy.sh: simple deployment entrypoint for hosted environments
+- scripts/: deployment and quality-check utilities
+- docs/: architecture and project documentation
 
 ## Tech Stack
 
@@ -48,12 +72,12 @@ SentinelAI aims to reduce incident investigation time by combining:
 ### Prerequisites
 
 - Docker and Docker Compose
-- Python 3.12+ (for local backend development)
-- Node.js 22+ (for local frontend development)
+- Python 3.12+ for backend development
+- Node.js 22+ for frontend development
 
-### Run with Docker Compose
+### Run Locally with Docker Compose
 
-1. Copy the environment example file:
+1. Copy the environment template:
    ```bash
    cp .env.example .env
    ```
@@ -62,20 +86,20 @@ SentinelAI aims to reduce incident investigation time by combining:
    ```bash
    docker compose up --build -d
    ```
-4. Access the application:
+4. Open the application:
    - Frontend: http://localhost:5173
    - Backend health check: http://localhost:8000/health
 
-### Local Development
+### Run Backend Locally
 
-#### Backend
 ```bash
 cd backend
 pip install .[dev]
 uvicorn app.main:app --reload
 ```
 
-#### Frontend
+### Run Frontend Locally
+
 ```bash
 cd frontend
 npm install
@@ -84,9 +108,9 @@ npm run dev
 
 ## Deployment
 
-The repository includes a Docker Compose-based deployment flow suitable for a VPS or cloud-hosted environment.
+The repository includes a Docker Compose deployment flow designed for a VPS, cloud VM, or similar hosted environment.
 
-### Host deployment
+### Deploy with the included script
 
 ```bash
 chmod +x scripts/deploy.sh
@@ -100,7 +124,7 @@ This script will:
 
 ## Environment Variables
 
-Key variables include:
+Key environment variables include:
 
 - JWT_SECRET_KEY
 - BOOTSTRAP_ADMIN_EMAIL
@@ -110,153 +134,24 @@ Key variables include:
 - APP_DEBUG
 - LLM_PROVIDER
 
+## Quality and Reliability
+
+The project includes:
+
+- linting and test automation support
+- health and readiness endpoints for orchestration
+- containerized deployment readiness
+- production-oriented configuration validation
+
 ## Notes
 
-- Use production values for secrets and admin credentials.
-- For hosted deployments, set APP_ENV=production and APP_DEBUG=false.
-- The backend includes health checks and readiness endpoints for container orchestration.
+- Use strong production secrets for all hosted deployments.
+- Set APP_ENV=production and APP_DEBUG=false for live environments.
+- The backend health endpoint and readiness endpoint are available for monitoring and container health checks.
 
 ## License
 
-This project is intended for internal or demonstration use unless otherwise specified by the repository owner.
-
-config/
-
-memory/
-
-observability/
-
-utils/
-
-tests/
-
-frontend/
-
-src/
-
-components/
-
-pages/
-
-hooks/
-
-services/
-
-layouts/
-
-types/
-
-contexts/
-
-assets/
-
----
-
-# MULTI AGENT DESIGN
-
-Implement specialized agents.
-
-Supervisor Agent
-
-Planner Agent
-
-Alert Analysis Agent
-
-Log Analysis Agent
-
-Metrics Analysis Agent
-
-Deployment Analysis Agent
-
-Dependency Analysis Agent
-
-Historical Incident Agent
-
-Correlation Agent
-
-Root Cause Agent
-
-Recommendation Agent
-
-Reflection Agent
-
-Incident Report Agent
-
-Notification Agent
-
-Every agent must contain:
-
-System Prompt
-
-Tools
-
-Structured Outputs
-
-Retry Logic
-
-Confidence Score
-
-Error Handling
-
-Logging
-
----
-
-# LANGGRAPH
-
-Implement Supervisor Graph.
-
-Graph flow:
-
-START
-
-↓
-
-Supervisor
-
-↓
-
-Planner
-
-↓
-
-Parallel execution:
-
-Alert Agent
-
-Log Agent
-
-Metrics Agent
-
-Deployment Agent
-
-Dependency Agent
-
-↓
-
-Correlation Agent
-
-↓
-
-Historical Incident Agent
-
-↓
-
-Root Cause Agent
-
-↓
-
-Reflection Agent
-
-↓
-
-Recommendation Agent
-
-↓
-
-Incident Report Agent
-
-↓
+This project is intended for internal, demo, or portfolio use unless otherwise specified by the repository owner.
 
 Human Approval Node
 
