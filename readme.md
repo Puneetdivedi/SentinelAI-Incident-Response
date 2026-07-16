@@ -6,6 +6,8 @@ SentinelAI is an enterprise-style AI incident response platform designed to acce
 
 Live application: https://sentinelai-incident-response.vercel.app
 
+> Note: This URL is configured as the intended Vercel deployment target. It will become active once the Vercel project is created, the first deployment succeeds, and the `VERCEL_TOKEN`/project secrets are configured.
+
 ## What This Project Does
 
 SentinelAI helps engineering and operations teams:
