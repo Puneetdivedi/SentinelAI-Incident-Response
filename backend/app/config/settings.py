@@ -76,6 +76,14 @@ class Settings(BaseSettings):
             return [origin.strip() for origin in value.split(",") if origin.strip()]
         return value
 
+    @field_validator("app_env", mode="before")
+    @classmethod
+    def _normalize_app_env(cls, value: str | Literal["development", "staging", "production"]) -> str:
+        """Normalize the environment name for flexible environment variable values."""
+        if isinstance(value, str):
+            return value.strip().lower()
+        return value
+
     @field_validator("jwt_secret_key")
     @classmethod
     def _validate_jwt_secret(cls, value: str, info: ValidationInfo) -> str:
