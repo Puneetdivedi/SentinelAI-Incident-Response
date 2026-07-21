@@ -48,8 +48,9 @@ class SqlAlchemyInvestigationRepository(InvestigationRepository):
         )
         self._session.add(row)
         await self._session.flush()
-        await self._session.refresh(row)
-        return self._to_entity(row)
+        entity = await self.get(row.id)
+        assert entity is not None
+        return entity
 
     async def get(self, investigation_id: str) -> Investigation | None:
         result = await self._session.execute(
@@ -119,6 +120,7 @@ class SqlAlchemyInvestigationRepository(InvestigationRepository):
 
         await self._replace_children(row, state)
         await self._session.flush()
+        self._session.expire(row)
         return await self.get(investigation_id)  # reload with children
 
     def _to_entity(self, row: InvestigationModel | None) -> Investigation | None:
@@ -130,6 +132,7 @@ class SqlAlchemyInvestigationRepository(InvestigationRepository):
             incident_id=row.incident_id,
             status=row.status,
             approval_status=row.approval_status,
+            execution_plan=row.execution_plan or [],
             logs=row.logs or [],
             alerts=row.alerts or [],
             metrics=row.metrics or [],
@@ -172,6 +175,7 @@ class SqlAlchemyInvestigationRepository(InvestigationRepository):
 
     def _to_report(self, row: ReportModel) -> Report:
         return Report(
+            id=row.id,
             format=row.format,
             title=row.title,
             content=row.content,

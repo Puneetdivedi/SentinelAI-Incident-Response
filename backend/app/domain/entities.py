@@ -75,6 +75,9 @@ class Investigation:
     status: InvestigationStatus = InvestigationStatus.PENDING
     approval_status: ApprovalStatus = ApprovalStatus.PENDING
 
+    # Agent execution plan
+    execution_plan: list[str] = field(default_factory=list)
+
     # Collected evidence
     logs: list[LogEntry] = field(default_factory=list)
     alerts: list[Alert] = field(default_factory=list)

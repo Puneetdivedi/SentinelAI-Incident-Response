@@ -6,10 +6,11 @@ from app.config.settings import Settings
 
 
 def test_app_env_is_normalized() -> None:
-    settings = Settings(app_env="Production")
+    settings = Settings(app_env="Production", jwt_secret_key="some-secure-key-123")
     assert settings.app_env == "production"
 
 
 def test_debug_is_disabled_in_production() -> None:
-    settings = Settings(app_env="production", app_debug=True)
+    settings = Settings(app_env="production", app_debug=True, jwt_secret_key="some-secure-key-123")
     assert settings.app_debug is False
+

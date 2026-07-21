@@ -21,7 +21,7 @@ from app.domain.exceptions import AuthenticationError
 from app.graphs.instance import get_investigation_runner
 from app.repositories.audit_repository import SqlAlchemyAuditLogRepository
 from app.repositories.incident_repository import SqlAlchemyIncidentRepository
-from app.repositories.interfaces import AuditLogRepository, UserRepository
+from app.repositories.interfaces import AuditLogRepository, UserRepository, IncidentRepository, InvestigationRepository
 from app.repositories.investigation_repository import SqlAlchemyInvestigationRepository
 from app.repositories.user_repository import SqlAlchemyUserRepository
 from app.services.audit_service import AuditService
