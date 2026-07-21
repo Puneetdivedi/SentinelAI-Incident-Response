@@ -9,7 +9,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import Any
 
-from app.domain.entities import AuditEntry, User
+from app.domain.entities import AuditEntry, Incident, Investigation, User
 from app.domain.enums import (
     ApprovalStatus,
     IncidentSeverity,
@@ -61,7 +61,7 @@ class AuditLogRepository(ABC):
 
 
 class IncidentRepository(ABC):
-    """Persistence port for incidents. Returns ORM models (JSON-heavy aggregate)."""
+    """Persistence port for incidents."""
 
     @abstractmethod
     async def create(
@@ -72,31 +72,31 @@ class IncidentRepository(ABC):
         severity: IncidentSeverity,
         affected_service: str | None,
         created_by: str | None,
-    ) -> Any: ...
+    ) -> Incident: ...
 
     @abstractmethod
-    async def get(self, incident_id: str) -> Any | None: ...
+    async def get(self, incident_id: str) -> Incident | None: ...
 
     @abstractmethod
-    async def list(self, *, limit: int = 50, offset: int = 0) -> list[Any]: ...
+    async def list(self, *, limit: int = 50, offset: int = 0) -> list[Incident]: ...
 
     @abstractmethod
-    async def set_status(self, incident_id: str, status: IncidentStatus) -> Any: ...
+    async def set_status(self, incident_id: str, status: IncidentStatus) -> Incident: ...
 
 
 class InvestigationRepository(ABC):
     """Persistence port for investigations and their child records."""
 
     @abstractmethod
-    async def create(self, *, incident_id: str) -> Any: ...
+    async def create(self, *, incident_id: str) -> Investigation: ...
 
     @abstractmethod
-    async def get(self, investigation_id: str) -> Any | None: ...
+    async def get(self, investigation_id: str) -> Investigation | None: ...
 
     @abstractmethod
     async def list(
         self, *, incident_id: str | None = None, limit: int = 50, offset: int = 0
-    ) -> list[Any]: ...
+    ) -> list[Investigation]: ...
 
     @abstractmethod
     async def save_state(
@@ -108,4 +108,4 @@ class InvestigationRepository(ABC):
         approval_status: ApprovalStatus,
         completed: bool = False,
         approved_by: str | None = None,
-    ) -> Any: ...
+    ) -> Investigation: ...

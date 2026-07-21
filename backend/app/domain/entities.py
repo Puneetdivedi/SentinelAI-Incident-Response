@@ -24,6 +24,7 @@ from app.domain.value_objects import (
     LogEntry,
     MetricPoint,
     Recommendation,
+    Report,
     RootCauseHypothesis,
     TimelineEvent,
 )
@@ -86,6 +87,9 @@ class Investigation:
     root_cause_candidates: list[RootCauseHypothesis] = field(default_factory=list)
     recommendations: list[Recommendation] = field(default_factory=list)
     historical_match_ids: list[str] = field(default_factory=list)
+    reports: list[Report] = field(default_factory=list)
+    confidence_scores: dict[str, float] = field(default_factory=dict)
+    errors: list[dict] = field(default_factory=list)
 
     # Observability
     langfuse_trace_id: str | None = None

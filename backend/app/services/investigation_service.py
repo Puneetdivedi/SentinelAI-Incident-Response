@@ -7,6 +7,7 @@ graph to the human-approval interrupt, snapshots state to the DB, and resumes on
 from __future__ import annotations
 
 from app.config.logging import get_logger
+from app.domain.entities import Incident
 from app.domain.enums import (
     ApprovalStatus,
     IncidentSeverity,
@@ -15,11 +16,9 @@ from app.domain.enums import (
 )
 from app.domain.exceptions import EntityNotFoundError, InvestigationError, ValidationError
 from app.graphs.runner import InvestigationGraphRunner
-from app.models.incident import IncidentModel
 from app.observability.langfuse_client import flush as langfuse_flush
 from app.observability.langfuse_client import langfuse_trace_url
 from app.observability.tracing import start_investigation_trace
-from app.models.investigation import InvestigationModel
 from app.repositories.interfaces import (
     AuditLogRepository,
     IncidentRepository,
@@ -55,7 +54,7 @@ class InvestigationService:
         severity: IncidentSeverity,
         affected_service: str | None,
         actor_id: str | None,
-    ) -> IncidentModel:
+    ) -> Incident:
         incident = await self._incidents.create(
             title=title,
             description=description,
@@ -69,10 +68,10 @@ class InvestigationService:
         )
         return incident
 
-    async def list_incidents(self, *, limit: int = 50, offset: int = 0) -> list[IncidentModel]:
+    async def list_incidents(self, *, limit: int = 50, offset: int = 0) -> list[Incident]:
         return await self._incidents.list(limit=limit, offset=offset)
 
-    async def get_incident(self, incident_id: str) -> IncidentModel:
+    async def get_incident(self, incident_id: str) -> Incident:
         incident = await self._incidents.get(incident_id)
         if incident is None:
             raise EntityNotFoundError(f"Incident '{incident_id}' not found.")
@@ -150,54 +149,57 @@ class InvestigationService:
 
     async def list_investigations(
         self, *, incident_id: str | None = None, limit: int = 50, offset: int = 0
-    ) -> list[InvestigationModel]:
+    ) -> list[Investigation]:
         return await self._investigations.list(
             incident_id=incident_id, limit=limit, offset=offset
         )
 
     # ── Mapping ──────────────────────────────────────────────
     @staticmethod
-    def _to_detail(row: InvestigationModel) -> InvestigationDetail:
+    def _to_detail(row: Investigation) -> InvestigationDetail:
         return InvestigationDetail(
             id=row.id,
             incident_id=row.incident_id,
             status=row.status,
             approval_status=row.approval_status,
-            execution_plan=row.execution_plan or [],
-            logs=row.logs or [],
-            alerts=row.alerts or [],
-            metrics=row.metrics or [],
-            deployments=row.deployments or [],
-            dependencies=row.dependencies or [],
-            timeline=row.timeline or [],
-            historical_match_ids=row.historical_match_ids or [],
+            execution_plan=row.execution_plan,
+            logs=row.logs,
+            alerts=row.alerts,
+            metrics=row.metrics,
+            deployments=row.deployments,
+            dependencies=row.dependencies,
+            timeline=row.timeline,
+            historical_match_ids=row.historical_match_ids,
             root_cause_candidates=[
                 {
                     "category": rc.category.value,
                     "title": rc.title,
                     "reasoning": rc.reasoning,
-                    "confidence": rc.confidence,
-                    "evidence": rc.evidence,
-                    "supporting_logs": rc.supporting_logs,
-                    "supporting_metrics": rc.supporting_metrics,
+                    "confidence": rc.confidence.value,
+                    "evidence": [
+                        {"description": e.description, "source": e.source, "weight": e.weight}
+                        for e in rc.evidence
+                    ],
+                    "supporting_logs": list(rc.supporting_logs),
+                    "supporting_metrics": list(rc.supporting_metrics),
                 }
-                for rc in row.root_causes
+                for rc in row.root_cause_candidates
             ],
             recommendations=[
                 {
-                    "action": r.action,
+                    "action": r.action.value,
                     "title": r.title,
                     "justification": r.justification,
                     "priority": r.priority.value,
                     "risk": r.risk.value,
-                    "confidence": r.confidence,
+                    "confidence": r.confidence.value,
                     "requires_approval": r.requires_approval,
                 }
                 for r in row.recommendations
             ],
             reports=[ReportRead.model_validate(rp) for rp in row.reports],
-            confidence_scores=row.confidence_scores or {},
-            errors=row.errors or [],
+            confidence_scores=row.confidence_scores,
+            errors=row.errors,
             langfuse_trace_id=row.langfuse_trace_id,
             langfuse_session_id=row.langfuse_session_id,
             langfuse_trace_url=langfuse_trace_url(row.langfuse_trace_id),

@@ -84,6 +84,17 @@ class Deployment:
 
 
 @dataclass(frozen=True, slots=True)
+class Report:
+    """A generated investigation report."""
+
+    id: str
+    format: ReportFormat
+    title: str
+    content: str
+    created_at: datetime | None = None
+
+
+@dataclass(frozen=True, slots=True)
 class DependencyStatus:
     """Health snapshot of an upstream/downstream dependency."""
 

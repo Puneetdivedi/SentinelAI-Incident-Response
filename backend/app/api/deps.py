@@ -45,8 +45,18 @@ def get_audit_repository(session: SessionDep) -> AuditLogRepository:
     return SqlAlchemyAuditLogRepository(session)
 
 
+def get_incident_repository(session: SessionDep) -> IncidentRepository:
+    return SqlAlchemyIncidentRepository(session)
+
+
+def get_investigation_repository(session: SessionDep) -> InvestigationRepository:
+    return SqlAlchemyInvestigationRepository(session)
+
+
 UserRepoDep = Annotated[UserRepository, Depends(get_user_repository)]
 AuditRepoDep = Annotated[AuditLogRepository, Depends(get_audit_repository)]
+IncidentRepoDep = Annotated[IncidentRepository, Depends(get_incident_repository)]
+InvestigationRepoDep = Annotated[InvestigationRepository, Depends(get_investigation_repository)]
 
 
 # ── Services ─────────────────────────────────────────────────
@@ -62,12 +72,16 @@ def get_audit_service(audit: AuditRepoDep) -> AuditService:
     return AuditService(audit)
 
 
-def get_investigation_service(session: SessionDep) -> InvestigationService:
+def get_investigation_service(
+    incidents: IncidentRepoDep,
+    investigations: InvestigationRepoDep,
+    audit_repository: AuditRepoDep,
+) -> InvestigationService:
     return InvestigationService(
-        incidents=SqlAlchemyIncidentRepository(session),
-        investigations=SqlAlchemyInvestigationRepository(session),
+        incidents=incidents,
+        investigations=investigations,
         runner=get_investigation_runner(),
-        audit_repository=SqlAlchemyAuditLogRepository(session),
+        audit_repository=audit_repository,
     )
 
 

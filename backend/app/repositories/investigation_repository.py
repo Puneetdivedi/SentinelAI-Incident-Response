@@ -13,16 +13,19 @@ from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from app.domain.entities import Investigation, Recommendation, Report, RootCauseHypothesis
 from app.domain.enums import (
     AgentName,
     ApprovalStatus,
     InvestigationStatus,
     RecommendationPriority,
     ReportFormat,
+    RemediationAction,
     RiskLevel,
     RootCauseCategory,
 )
 from app.domain.exceptions import EntityNotFoundError
+from app.domain.value_objects import ConfidenceScore, Evidence
 from app.models.investigation import (
     AgentRunModel,
     InvestigationModel,
@@ -37,7 +40,7 @@ class SqlAlchemyInvestigationRepository(InvestigationRepository):
     def __init__(self, session: AsyncSession) -> None:
         self._session = session
 
-    async def create(self, *, incident_id: str) -> InvestigationModel:
+    async def create(self, *, incident_id: str) -> Investigation:
         row = InvestigationModel(
             incident_id=incident_id,
             status=InvestigationStatus.PENDING,
@@ -46,9 +49,9 @@ class SqlAlchemyInvestigationRepository(InvestigationRepository):
         self._session.add(row)
         await self._session.flush()
         await self._session.refresh(row)
-        return row
+        return self._to_entity(row)
 
-    async def get(self, investigation_id: str) -> InvestigationModel | None:
+    async def get(self, investigation_id: str) -> Investigation | None:
         result = await self._session.execute(
             select(InvestigationModel)
             .where(InvestigationModel.id == investigation_id)
@@ -59,16 +62,23 @@ class SqlAlchemyInvestigationRepository(InvestigationRepository):
                 selectinload(InvestigationModel.agent_runs),
             )
         )
-        return result.scalar_one_or_none()
+        row = result.scalar_one_or_none()
+        return self._to_entity(row) if row is not None else None
 
     async def list(
         self, *, incident_id: str | None = None, limit: int = 50, offset: int = 0
-    ) -> list[InvestigationModel]:
+    ) -> list[Investigation]:
         stmt = select(InvestigationModel).order_by(InvestigationModel.created_at.desc())
         if incident_id is not None:
             stmt = stmt.where(InvestigationModel.incident_id == incident_id)
-        result = await self._session.execute(stmt.limit(limit).offset(offset))
-        return list(result.scalars().all())
+        result = await self._session.execute(
+            stmt.options(
+                selectinload(InvestigationModel.root_causes),
+                selectinload(InvestigationModel.recommendations),
+                selectinload(InvestigationModel.reports),
+            ).limit(limit).offset(offset)
+        )
+        return [self._to_entity(row) for row in result.scalars().all()]
 
     async def save_state(
         self,
@@ -79,7 +89,7 @@ class SqlAlchemyInvestigationRepository(InvestigationRepository):
         approval_status: ApprovalStatus,
         completed: bool = False,
         approved_by: str | None = None,
-    ) -> InvestigationModel:
+    ) -> Investigation:
         row = await self._session.get(InvestigationModel, investigation_id)
         if row is None:
             raise EntityNotFoundError(f"Investigation '{investigation_id}' not found.")
@@ -110,6 +120,63 @@ class SqlAlchemyInvestigationRepository(InvestigationRepository):
         await self._replace_children(row, state)
         await self._session.flush()
         return await self.get(investigation_id)  # reload with children
+
+    def _to_entity(self, row: InvestigationModel | None) -> Investigation | None:
+        if row is None:
+            return None
+
+        return Investigation(
+            id=row.id,
+            incident_id=row.incident_id,
+            status=row.status,
+            approval_status=row.approval_status,
+            logs=row.logs or [],
+            alerts=row.alerts or [],
+            metrics=row.metrics or [],
+            deployments=row.deployments or [],
+            dependencies=row.dependencies or [],
+            timeline=row.timeline or [],
+            historical_match_ids=row.historical_match_ids or [],
+            root_cause_candidates=[self._to_root_cause(rc) for rc in row.root_causes],
+            recommendations=[self._to_recommendation(r) for r in row.recommendations],
+            reports=[self._to_report(rp) for rp in row.reports],
+            confidence_scores=row.confidence_scores or {},
+            errors=row.errors or [],
+            langfuse_trace_id=row.langfuse_trace_id,
+            langfuse_session_id=row.langfuse_session_id,
+            created_at=row.created_at,
+            completed_at=row.completed_at,
+        )
+
+    def _to_root_cause(self, row: RootCauseModel) -> RootCauseHypothesis:
+        return RootCauseHypothesis(
+            category=row.category,
+            title=row.title,
+            reasoning=row.reasoning,
+            confidence=ConfidenceScore(row.confidence),
+            evidence=tuple(Evidence(**item) for item in row.evidence or []),
+            supporting_logs=tuple(row.supporting_logs or []),
+            supporting_metrics=tuple(row.supporting_metrics or []),
+        )
+
+    def _to_recommendation(self, row: RecommendationModel) -> Recommendation:
+        return Recommendation(
+            action=RemediationAction(row.action),
+            title=row.title,
+            justification=row.justification,
+            priority=row.priority,
+            risk=row.risk,
+            confidence=ConfidenceScore(row.confidence),
+            requires_approval=row.requires_approval,
+        )
+
+    def _to_report(self, row: ReportModel) -> Report:
+        return Report(
+            format=row.format,
+            title=row.title,
+            content=row.content,
+            created_at=row.created_at,
+        )
 
     async def _replace_children(self, row: InvestigationModel, state: dict) -> None:
         inv_id = row.id
