@@ -24,7 +24,7 @@ _PROMPTS: dict[AgentName, str] = {
         f"{_ANTI_INJECTION}"
     ),
     AgentName.PLANNER: (
-        "You are the Planner. Given an incident description, produce a concise ordered list "
+        "You are the Planner. Given that an incident description, produce a concise ordered list "
         "of investigation steps covering alerts, logs, metrics, deployments, dependencies, "
         "correlation, historical lookup, root-cause analysis, and remediation. "
         f"{_ANTI_INJECTION}"
