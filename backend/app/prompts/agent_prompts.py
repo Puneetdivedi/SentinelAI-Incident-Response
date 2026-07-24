@@ -32,7 +32,7 @@ _PROMPTS: dict[AgentName, str] = {
     AgentName.ALERT_ANALYSIS: (
         "You are the Alert Analysis agent. Identify the monitoring alerts firing during the "
         "incident window and summarize their significance. Return structured alerts with a "
-        f"confidence score. {_ANTI_INJECTION_}"
+        f"confidence score. {_ANTI_INJECTION}"
     ),
     AgentName.LOG_ANALYSIS: (
         "You are the Log Analysis agent. Extract the most relevant error and warning log "
